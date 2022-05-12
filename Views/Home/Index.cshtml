@@ -1,0 +1,65 @@
+﻿
+<style>
+    .scanned-files-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        .scanned
+
+    {
+        width: 100px;
+        height: 150px;
+        object-fit: cover;
+        border: 1px solid red;
+    }
+
+    }
+
+    .scanned {
+        width: 100px;
+        height: 150px;
+        object-fit: cover;
+        border: 1px solid red;
+    }
+</style>
+
+<body id="body">
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+        function scan() {
+            axios.post("/ScannerService.asmx/Scanner")
+                .then((res) => {
+
+                    parser = new DOMParser();
+                    xmlDoc = parser.parseFromString(res, "text/xml");
+
+                    console.log(xmlDoc);
+                    responseJson =
+                        xmlDoc.getElementsByTagName("anyType")[0].childNodes[0].nodeValue;
+
+                    response = {
+                        data: JSON.parse(responseJson)
+                    };
+
+                    if (response.data.images.length > 0) {
+                        var mainScannerWarrper = document.createElement('div');
+                        mainScannerWarrper.className = "scanned-files-wrapper";
+                        mainScannerWarrper.id = "scanneds";
+
+                        document.getElementById("body").appendChild(mainScannerWarrper);
+
+                        for (var i = 0; i < response.data.images.length; i++) {
+                            var tag = document.getElementById("scanneds");
+                            var img = document.createElement('img');
+                            img.src = "data:image/jpeg;base64," + response.data.images[i];
+                            img.className = "scanned";
+                            tag.appendChild(img);
+                        }
+                    }
+                })
+        }
+
+    </script>
+</body>
